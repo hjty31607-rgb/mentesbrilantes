@@ -52,6 +52,8 @@
         }
         .puzzle-piece {
             transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+            aspect-ratio: 1 / 1; /* Ensure pieces are square */
+            background-color: #1e293b; /* Fallback/Placeholder color */
         }
         .puzzle-piece.selected {
             transform: scale(1.1);
@@ -165,8 +167,9 @@
             <div class="container mx-auto px-6">
                 <h2 class="text-4xl font-bold text-center text-gold mb-8 font-fredoka drop-shadow-lg">Rompecabezas Cósmico</h2>
                 <div class="glass-card rounded-lg shadow-lg p-4 md:p-6 max-w-xl mx-auto">
-                    <div id="puzzle-container" class="grid grid-cols-4 gap-1 mx-auto" style="width: 400px; height: 400px;">
-                        <!-- Puzzle pieces will be generated here -->
+                    <div id="puzzle-container" class="grid grid-cols-4 gap-1 mx-auto w-full max-w-[400px] aspect-square">
+                        <div class="col-span-4 flex justify-center items-center h-full"><div class="loader"></div></div>
+                        <!-- Puzzle pieces will be generated here by JS -->
                     </div>
                     <div class="text-center mt-4">
                         <button id="reset-puzzle" class="bg-amber-500 text-slate-900 font-bold py-2 px-5 rounded-full hover:bg-amber-400 transition">Reiniciar</button>
@@ -216,18 +219,137 @@
         </footer>
     </div>
 
+    <!-- Login Screen -->
+    <div id="login-screen" class="hidden fixed inset-0 bg-slate-950 z-[101] flex items-center justify-center p-4">
+        <div class="glass-card p-8 rounded-lg shadow-2xl w-full max-w-sm text-center">
+            <h2 class="text-3xl font-fredoka text-yellow-400 mb-6">Acceso de Administrador</h2>
+            <form id="login-form" class="space-y-4">
+                <input type="text" id="username-input" class="w-full p-3 rounded bg-slate-700 text-white placeholder-slate-400 border border-slate-600 focus:border-yellow-500 focus:ring focus:ring-yellow-500/50" placeholder="Usuario" required>
+                <input type="password" id="password-input" class="w-full p-3 rounded bg-slate-700 text-white placeholder-slate-400 border border-slate-600 focus:border-yellow-500 focus:ring focus:ring-yellow-500/50" placeholder="Contraseña" required>
+                <button type="submit" class="w-full bg-amber-500 text-slate-900 font-bold py-3 rounded-full hover:bg-amber-400 transition">Entrar</button>
+            </form>
+            <button id="cancel-login-btn" class="mt-4 text-slate-400 hover:text-yellow-400 transition">Cancelar</button>
+        </div>
+    </div>
+
     <!-- Admin Panel -->
     <div id="admin-panel" class="hidden min-h-screen bg-slate-900 text-slate-300 p-4 sm:p-6 lg:p-8">
-        <!-- ... Admin Panel content remains the same ... -->
+        <div class="max-w-4xl mx-auto">
+            <h2 class="text-4xl font-bold font-fredoka text-yellow-400 mb-8">Panel de Administración</h2>
+            
+            <div class="space-y-8">
+                <!-- Hero Image Setting -->
+                <div class="glass-card p-4 rounded-lg">
+                    <h3 class="text-2xl font-fredoka text-white mb-4">Imagen Principal (Hero)</h3>
+                    <div class="flex flex-col md:flex-row items-center gap-4">
+                        <img id="admin-hero-preview" class="w-full md:w-48 h-32 object-cover rounded-md border border-amber-500/50" src="" onerror="this.onerror=null;this.src='https://placehold.co/150x150/0f2f4c/FFFFFF?text=Sin+Imagen';" alt="Hero Preview">
+                        <label class="cursor-pointer bg-amber-500 text-slate-900 font-bold py-2 px-4 rounded-full hover:bg-amber-400 transition">
+                            Cambiar Imagen Principal (1920x1080 recomendado)
+                            <input type="file" id="change-hero-input" class="hidden" accept="image/*">
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Announcements Management -->
+                <div class="glass-card p-4 rounded-lg">
+                    <h3 class="text-2xl font-fredoka text-white mb-4">Gestionar Anuncios</h3>
+                    <div id="admin-announcements-list" class="space-y-2 mb-4 max-h-40 overflow-y-auto">
+                        <!-- Announcements rendered here -->
+                    </div>
+                    <input type="text" id="new-announcement-input" class="w-full p-2 rounded bg-slate-700 text-white placeholder-slate-400 mb-2" placeholder="Escribe un nuevo anuncio...">
+                    <button id="add-announcement-btn" class="w-full bg-blue-600 text-white font-bold py-2 px-4 rounded-full hover:bg-blue-500 transition">Agregar Anuncio</button>
+                </div>
+
+                <!-- Groups Management -->
+                <div class="glass-card p-4 rounded-lg">
+                    <h3 class="text-2xl font-fredoka text-white mb-4">Gestionar Grupos <button id="add-group-btn" class="text-sm bg-green-600 hover:bg-green-500 text-white px-3 py-1 rounded-full ml-4">Agregar Nuevo</button></h3>
+                    <div id="admin-groups-list" class="space-y-2 max-h-40 overflow-y-auto">
+                        <!-- Groups rendered here -->
+                    </div>
+                </div>
+
+                <!-- Workshops Management -->
+                <div class="glass-card p-4 rounded-lg">
+                    <h3 class="text-2xl font-fredoka text-white mb-4">Gestionar Talleres <button id="add-workshop-btn" class="text-sm bg-green-600 hover:bg-green-500 text-white px-3 py-1 rounded-full ml-4">Agregar Nuevo</button></h3>
+                    <div id="admin-workshops-list" class="space-y-2 max-h-40 overflow-y-auto">
+                        <!-- Workshops rendered here -->
+                    </div>
+                </div>
+
+                <!-- Staff Management -->
+                <div class="glass-card p-4 rounded-lg">
+                    <h3 class="text-2xl font-fredoka text-white mb-4">Gestionar Equipo <button id="add-staff-btn" class="text-sm bg-green-600 hover:bg-green-500 text-white px-3 py-1 rounded-full ml-4">Agregar Nuevo</button></h3>
+                    <div id="admin-staffs-list" class="space-y-2 max-h-40 overflow-y-auto">
+                        <!-- Staff rendered here -->
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-8 text-center">
+                <button id="admin-logout-btn" class="bg-red-600 text-white font-bold py-2 px-6 rounded-full hover:bg-red-500 transition">Cerrar Sesión</button>
+            </div>
+        </div>
     </div>
 
     <!-- Modals -->
-    <!-- ... Modals remain the same ... -->
+    <!-- Gallery Modal (Public View) -->
+    <div id="galleryModal" class="hidden fixed inset-0 bg-black bg-opacity-80 z-[100] flex items-center justify-center p-4">
+        <div class="bg-slate-800 glass-card rounded-lg p-6 w-full max-w-2xl modal-content relative">
+            <button onclick="document.getElementById('galleryModal').classList.add('hidden')" class="absolute top-4 right-4 text-white text-3xl font-bold p-1">&times;</button>
+            <div id="galleryModalContent" class="text-white">
+                <!-- Content will be rendered here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Edit/Add Modal -->
+    <div id="adminEditModal" class="hidden fixed inset-0 bg-black bg-opacity-80 z-[100] flex items-center justify-center p-4">
+        <div class="bg-slate-800 glass-card rounded-lg p-6 w-full max-w-xl modal-content overflow-y-auto relative">
+            <button onclick="document.getElementById('adminEditModal').classList.add('hidden'); currentAdminModal={type:null, id:null};" class="absolute top-4 right-4 text-white text-3xl font-bold p-1">&times;</button>
+            <h3 id="adminEditModalTitle" class="text-2xl font-fredoka text-yellow-400 mb-4">Editar Elemento</h3>
+            
+            <form id="admin-edit-form" class="space-y-4">
+                <!-- Fields for Group/Workshop/Staff -->
+                <input type="text" id="edit-title" class="w-full p-2 rounded bg-slate-700 text-white placeholder-slate-400" placeholder="Título / Nombre" required>
+                <textarea id="edit-description" class="w-full p-2 rounded bg-slate-700 text-white placeholder-slate-400 h-24" placeholder="Descripción / Puesto (opcional)"></textarea>
+                
+                <button type="submit" class="w-full bg-green-600 text-white font-bold py-2 rounded-full hover:bg-green-500 transition">Guardar Cambios</button>
+            </form>
+
+            <div id="gallery-management-section" class="mt-8">
+                <h4 class="text-xl font-fredoka text-white mb-4">Gestionar Fotos de Galería</h4>
+                
+                <div class="grid grid-cols-3 gap-3 max-h-48 overflow-y-auto pr-2" id="adminEditModalGallery">
+                    <!-- Gallery images will be rendered here -->
+                </div>
+                
+                <div class="mt-4">
+                    <label class="cursor-pointer bg-blue-600 text-white font-bold py-2 px-4 rounded-full hover:bg-blue-500 transition block text-center">
+                        Subir Nueva Foto a Galería
+                        <input type="file" id="add-gallery-photo-input" class="hidden" accept="image/*">
+                    </label>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div id="confirm-modal" class="hidden fixed inset-0 bg-black bg-opacity-80 z-[100] flex items-center justify-center p-4">
+        <div class="bg-slate-800 glass-card rounded-lg p-6 w-full max-w-sm text-center">
+            <h3 class="text-xl font-fredoka text-white mb-4">¿Estás Seguro?</h3>
+            <p id="confirm-message" class="mb-6 text-slate-300">Esta acción no se puede deshacer.</p>
+            <div class="flex justify-center space-x-4">
+                <button id="confirm-cancel-btn" class="bg-slate-600 text-white font-bold py-2 px-4 rounded-full hover:bg-slate-500 transition">Cancelar</button>
+                <button id="confirm-delete-btn" class="bg-red-600 text-white font-bold py-2 px-4 rounded-full hover:bg-red-500 transition">Eliminar</button>
+            </div>
+        </div>
+    </div>
 
     <script type="module">
         import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 
         // --- SUPABASE CONFIG ---
+        // NOTE: The user has already provided the keys, so we keep them as is.
         const supabaseUrl = 'https://shfevyqcmozvsfljsbjz.supabase.co';
         const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNoZmV2eXFjbW96dnNmbGpzYmp6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA2MzUyOTUsImV4cCI6MjA3NjIxMTI5NX0.vpVqAUPB_dk22q8ZKqaOEXTuNhC4Dbq1Vn87dzLX2cY';
         const supabase = createClient(supabaseUrl, supabaseKey);
@@ -241,15 +363,19 @@
         const adminEditModal = document.getElementById('adminEditModal');
         const confirmModal = document.getElementById('confirm-modal');
         
-        const credentials = { user: 'carecenter', pass: '6122' };
+        // Simple fixed credentials for admin access
+        const credentials = { user: 'carecenter', pass: '6122' }; 
         let itemToDelete = null;
-        let currentAdminModal = { type: null, id: null };
-        let currentGallery = { type: null, id: null, index: 0, items: [] };
+        let currentAdminModal = { type: null, id: null }; // { type: 'group'/'workshop'/'staff', id: null }
+        let currentGallery = { type: null, id: null, index: 0, items: [], title: '' };
 
-        // --- RENDER FUNCTIONS ---
+        // --- RENDER FUNCTIONS (Public) ---
         const renderHeroImage = async () => {
             const { data, error } = await supabase.from('site_settings').select('url').eq('id', 'heroImageUrl').single();
-            const imageUrl = data ? data.url : 'https://shfevyqcmozvsfljsbjz.supabase.co/storage/v1/object/sign/guarde/imagen_2025-10-16_234806265.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9lOTBhMDU1OC0wNGU0LTRjNzUtOTYzMS04NTc2NTE5MjAyNzciLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJndWFyZGUvaW1hZ2VuXzIwMjUtMTAtMTZfMjM0ODA2MjY1LnBuZyIsImlhdCI6MTc2MDc2NzY4MSwiZXhwIjoxNzkyMzAzNjgxfQ.Q7NpicLMspkbLoF4VpyUb_BH-4sZyaIVduzVy3krOzU';
+            // Default image URL if not found in DB
+            const defaultUrl = 'https://shfevyqcmozvsfljsbjz.supabase.co/storage/v1/object/sign/guarde/imagen_2025-10-16_234806265.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9lOTBhMDU1OC0wNGU0LTRjNzUtOTYzMS04NTc2NTE5MjAyNzciLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJndWFyZGUvaW1hZ2VuXzIwMjUtMTAtMTZfMjM0ODA2MjY1LnBuZyIsImlhdCI6MTc2MDc2NzY4MSwiZXhwIjoxNzkyMzAzNjgxfQ.Q7NpicLMspkbLoF4VpyUb_BH-4sZyaIVduzVy3krOzU';
+            const imageUrl = data ? data.url : defaultUrl;
+            
             heroSection.style.backgroundImage = `url('${imageUrl}')`;
             const adminPreview = document.getElementById('admin-hero-preview');
             if (adminPreview) {
@@ -265,21 +391,13 @@
             });
         };
         
-        const renderAdminAnnouncements = (announcements) => {
-            const adminList = document.getElementById('admin-announcements-list');
-            adminList.innerHTML = '';
-            announcements.forEach(item => {
-                adminList.innerHTML += `<div class="flex items-center justify-between bg-slate-800 p-2 rounded"><span>${item.text}</span><button data-id="${item.id}" class="delete-announcement-btn text-red-500 hover:text-red-400">&times;</button></div>`;
-            });
-        };
-
         const createCardHTML = (item, type) => `
-            <div class="glass-card rounded-lg shadow-lg overflow-hidden transform hover:-translate-y-2 transition-transform duration-300">
-                <img class="w-full h-48 object-cover" src="${item.cover_url}" alt="${item.title}">
-                <div class="p-6">
+            <div class="glass-card rounded-lg shadow-lg overflow-hidden transform hover:-translate-y-2 transition-transform duration-300 flex flex-col">
+                <img class="w-full h-48 object-cover" src="${item.cover_url}" alt="${item.title}" onerror="this.onerror=null;this.src='https://placehold.co/400x300/1e293b/FFFFFF?text=${item.title.replace(/ /g, '+')}';">
+                <div class="p-6 flex flex-col flex-grow">
                     <h3 class="text-xl font-bold text-white mb-2">${item.title}</h3>
-                    ${item.description ? `<p class="text-slate-400 mb-4">${item.description}</p>` : ''}
-                    <button data-type="${type}" data-id="${item.id}" class="view-gallery-btn w-full bg-amber-500 text-slate-900 font-bold py-2 px-4 rounded-full hover:bg-amber-400 transition">Ver Galería</button>
+                    ${item.description ? `<p class="text-slate-400 mb-4 flex-grow">${item.description}</p>` : '<div class="flex-grow"></div>'}
+                    <button data-type="${type}" data-id="${item.id}" class="view-gallery-btn w-full bg-amber-500 text-slate-900 font-bold py-2 px-4 rounded-full hover:bg-amber-400 transition mt-4">Ver Galería</button>
                 </div>
             </div>`;
         
@@ -301,11 +419,20 @@
             staff.forEach(person => {
                 list.innerHTML += `
                     <div class="text-center p-4 glass-card rounded-lg shadow-lg">
-                        <img class="w-32 h-32 mx-auto rounded-full shadow-md object-cover border-2 border-amber-500/50" src="${person.photo_url}" alt="${person.name}">
+                        <img class="w-32 h-32 mx-auto rounded-full shadow-md object-cover border-2 border-amber-500/50" src="${person.photo_url}" alt="${person.name}" onerror="this.onerror=null;this.src='https://placehold.co/128x128/facc15/333333?text=${person.name.split(' ')[0]}';">
                         <h4 class="mt-4 text-lg font-bold text-white">${person.name}</h4>
-                        <p class="text-sm text-amber-400">${person.position || ''}</p>
+                        <p class="text-sm text-amber-400">${person.position || 'Miembro del Equipo'}</p>
                     </div>
                 `;
+            });
+        };
+
+        // --- RENDER FUNCTIONS (Admin) ---
+        const renderAdminAnnouncements = (announcements) => {
+            const adminList = document.getElementById('admin-announcements-list');
+            adminList.innerHTML = '';
+            announcements.forEach(item => {
+                adminList.innerHTML += `<div class="flex items-center justify-between bg-slate-800 p-2 rounded"><span>${item.text}</span><button data-id="${item.id}" class="delete-announcement-btn text-red-500 hover:text-red-400 font-bold text-xl leading-none">&times;</button></div>`;
             });
         };
 
@@ -316,22 +443,34 @@
             data.forEach(item => {
                 const photoUrl = type === 'staffs' ? item.photo_url : item.cover_url;
                 const title = type === 'staffs' ? item.name : item.title;
+                const itemId = item.id;
+                const itemType = type.slice(0,-1); // group, workshop, staff
+
                 listContainer.innerHTML += `
                     <div class="flex items-center justify-between bg-slate-800 p-2 rounded">
-                        <div class="flex items-center gap-2"><img src="${photoUrl}" class="w-10 h-10 object-cover rounded-sm"><span>${title}</span></div>
                         <div class="flex items-center gap-2">
-                            ${type !== 'staffs' ? `<button data-type="${type.slice(0,-1)}" data-id="${item.id}" class="manage-gallery-btn text-sm bg-blue-900/50 text-blue-300 px-2 py-1 rounded">Galería</button>` : ''}
-                            <label class="cursor-pointer text-xs bg-slate-700 px-2 py-1 rounded hover:bg-slate-600">Cambiar Foto<input type="file" data-type="${type.slice(0,-1)}" data-id="${item.id}" class="change-cover-input hidden" accept="image/*"></label>
-                            <button data-type="${type.slice(0,-1)}" data-id="${item.id}" class="delete-item-btn text-red-500 hover:text-red-400 text-xl">&times;</button>
+                            <img src="${photoUrl}" class="w-10 h-10 object-cover rounded-sm" onerror="this.onerror=null;this.src='https://placehold.co/40x40/facc15/333333?text=${title.charAt(0)}';">
+                            <span>${title}</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button data-type="${itemType}" data-id="${itemId}" class="edit-item-btn text-sm bg-yellow-900/50 text-yellow-300 px-2 py-1 rounded">Editar Info</button>
+                            ${itemType !== 'staff' ? `<button data-type="${itemType}" data-id="${itemId}" class="manage-gallery-btn text-sm bg-blue-900/50 text-blue-300 px-2 py-1 rounded">Galería</button>` : ''}
+                            <label class="cursor-pointer text-xs bg-slate-700 px-2 py-1 rounded hover:bg-slate-600">
+                                Foto<input type="file" data-type="${itemType}" data-id="${itemId}" class="change-cover-input hidden" accept="image/*">
+                            </label>
+                            <button data-type="${itemType}" data-id="${itemId}" class="delete-item-btn text-red-500 hover:text-red-400 text-xl font-bold leading-none">&times;</button>
                         </div>
                     </div>`;
             });
         };
 
-        // --- MODAL & GALLERY RENDER ---
+        // --- MODAL & GALLERY RENDER (Public) ---
         const openGalleryModal = async (type, id) => {
             const { data: galleryItems, error } = await supabase.from('gallery').select('*').eq('parent_id', id).eq('parent_type', type);
-            if (error || !galleryItems || galleryItems.length === 0) { alert('Esta galería está vacía o hubo un error.'); return; }
+            if (error || !galleryItems || galleryItems.length === 0) { 
+                alert('Esta galería está vacía. El administrador debe añadir fotos.'); 
+                return; 
+            }
             
             const tableName = type === 'group' ? 'groups' : 'workshops';
             const { data: parentItem } = await supabase.from(tableName).select('title').eq('id', id).single();
@@ -344,49 +483,28 @@
         const renderGalleryCarousel = () => {
             const photo = currentGallery.items[currentGallery.index];
             document.getElementById('galleryModalContent').innerHTML = `
-                <h3 class="text-2xl font-bold text-center mb-4 text-yellow-400">${currentGallery.title}</h3>
+                <h3 class="text-2xl font-bold text-center mb-4 text-yellow-400 font-fredoka">${currentGallery.title}</h3>
                 <div class="relative">
                     <img src="${photo.img_url}" alt="${photo.description}" class="w-full h-auto max-h-[60vh] object-contain rounded-md">
-                     ${currentGallery.items.length > 1 ? `<button class="gallery-nav-btn absolute top-1/2 left-2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full" data-direction="-1">&#10094;</button><button class="gallery-nav-btn absolute top-1/2 right-2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full" data-direction="1">&#10095;</button>` : ''}
+                    ${currentGallery.items.length > 1 ? `<button class="gallery-nav-btn absolute top-1/2 left-2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-75" data-direction="-1">&#10094;</button><button class="gallery-nav-btn absolute top-1/2 right-2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-75" data-direction="1">&#10095;</button>` : ''}
                 </div>
                 <p class="text-center mt-4 text-slate-300">${photo.description}</p>
                 <p class="text-center text-sm text-slate-500 mt-1">${currentGallery.index + 1} / ${currentGallery.items.length}</p>`;
         };
         
-        const openAdminEditModal = async (type, id) => {
-            currentAdminModal = { type, id };
-            const tableName = type === 'group' ? 'groups' : 'workshops';
-            const { data: parentItem } = await supabase.from(tableName).select('title').eq('id', id).single();
-            
-            document.getElementById('adminEditModalTitle').textContent = `Gestionar Galería: ${parentItem.title}`;
-            await renderAdminGalleryImages();
-            adminEditModal.classList.remove('hidden');
-        };
-        
-        const renderAdminGalleryImages = async () => {
-            const { type, id } = currentAdminModal;
-            const { data: galleryItems } = await supabase.from('gallery').select('*').eq('parent_id', id).eq('parent_type', type);
-            
-            const galleryContainer = document.getElementById('adminEditModalGallery');
-            galleryContainer.innerHTML = '';
-            galleryItems.forEach(photo => {
-                galleryContainer.innerHTML += `<div class="relative"><img src="${photo.img_url}" class="w-full h-32 object-cover rounded-md"><p class="text-xs truncate p-1 bg-black/50">${photo.description}</p><button data-id="${photo.id}" data-url="${photo.img_url}" class="delete-gallery-image-btn absolute top-1 right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs">&times;</button></div>`;
-            });
-        };
-
         // --- DATA FETCHING & STATE MANAGEMENT ---
         const fetchData = async (tableName) => {
-            const { data, error } = await supabase.from(tableName).select('*').order('created_at');
+            const { data, error } = await supabase.from(tableName).select('*').order('created_at', { ascending: true });
             if(error) throw error;
             return data;
         };
 
         const loadAllPublicData = async () => {
-             if (!supabaseUrl || !supabaseKey || supabaseUrl.includes('PON_AQUI')) {
-                const errorMessage = `<div class="text-center text-red-500 p-4 bg-red-100 rounded-lg"><p class="font-bold">Configuración Incompleta</p><p class="text-sm">Por favor, añade la URL y la clave de Supabase en el código para conectar la base de datos.</p></div>`;
-                document.querySelectorAll('#announcements-list, #groups-list, #workshops-list, #staff-list').forEach(el => el.innerHTML = errorMessage);
-                return;
-            }
+             if (!supabaseUrl || !supabaseKey || supabaseUrl.includes('shfevyqcmozvsfljsbjz.supabase.co')) {
+                // If using the placeholder keys/url, we continue loading, assuming the tables are set up.
+                // If the user replaces them, the database will connect.
+             }
+
             try {
                 await renderHeroImage();
                 const [announcements, groups, workshops, staff] = await Promise.all([
@@ -401,117 +519,620 @@
                 renderStaff(staff);
             } catch (error) {
                 console.error("Error loading public data:", error);
-                let errorText = `No se pudo conectar a Supabase. Revisa que las claves y las políticas de RLS de tus tablas sean correctas.`;
-                if (error && error.message && error.message.includes("Could not find the table")) {
-                    const tableNameMatch = error.message.match(/'public\.(.*?)'/);
-                    const tableName = tableNameMatch ? tableNameMatch[1] : 'desconocida';
-                    errorText = `¡Error de Base de Datos! La tabla <strong>'${tableName}'</strong> no se encontró. Por favor, ve al "SQL Editor" de tu proyecto de Supabase y asegúrate de haber ejecutado <strong>TODOS</strong> los scripts SQL de los Pasos 3, 5 y 6 que se encuentran en las instrucciones al principio de este archivo HTML. Si ya creaste las tablas, puede que necesites borrarlas (con <code>DROP TABLE nombre_tabla;</code>) y volver a crearlas con el código actualizado.`;
-                }
-                const errorMessage = `<div class="text-center text-red-500 p-4 bg-red-100 rounded-lg"><p class="font-bold">Error al Cargar Contenido</p><p class="text-sm">${errorText}</p></div>`;
-                 document.querySelectorAll('#announcements-list, #groups-list, #workshops-list, #staff-list').forEach(el => el.innerHTML = errorMessage);
+                const errorText = `Error al cargar el contenido. Revisa las claves de Supabase y las políticas de RLS. Detalle: ${error.message.substring(0, 100)}`;
+                const errorMessage = `<div class="text-center text-red-500 p-4 bg-red-900/20 border border-red-500 rounded-lg"><p class="font-bold">Error al Cargar Contenido</p><p class="text-sm">${errorText}</p></div>`;
+                document.querySelectorAll('#announcements-list, #groups-list, #workshops-list, #staff-list').forEach(el => el.innerHTML = errorMessage);
             }
         };
         
         const loadAllAdminData = async () => {
-            const [announcements, groups, workshops, staff] = await Promise.all([
-                fetchData("announcements"),
-                fetchData("groups"),
-                fetchData("workshops"),
-                fetchData("staffs")
-            ]);
-            renderAdminAnnouncements(announcements);
-            renderAdminList('groups', groups);
-            renderAdminList('workshops', workshops);
-            renderAdminList('staffs', staff);
+            try {
+                const [announcements, groups, workshops, staff] = await Promise.all([
+                    fetchData("announcements"),
+                    fetchData("groups"),
+                    fetchData("workshops"),
+                    fetchData("staffs")
+                ]);
+                renderAdminAnnouncements(announcements);
+                renderAdminList('groups', groups);
+                renderAdminList('workshops', workshops);
+                renderAdminList('staffs', staff);
+                renderHeroImage(); // Refresh admin hero preview
+            } catch (error) {
+                 console.error("Error loading admin data:", error);
+                 alert('Error al cargar datos de administración. Revisa la consola para más detalles.');
+            }
         };
 
         // --- HELPER FUNCTIONS ---
-        // ... (uploadFile, deleteFile, showLogin, hideLogin, showAdmin, hideAdmin functions remain the same) ...
+        
+        // Generates a unique filename for Supabase Storage
+        const generateFileName = (file, prefix) => {
+            const ext = file.name.split('.').pop();
+            const uniqueName = `${prefix}_${Date.now()}.${ext}`;
+            return uniqueName;
+        };
 
-        // --- EVENT LISTENERS ---
-        // ... (most event listeners remain the same) ...
+        const uploadFile = async (file, bucket, folder, id, type) => {
+            const fileName = generateFileName(file, `${type}_${id}`);
+            const filePath = `${folder}/${fileName}`;
+
+            try {
+                const { error } = await supabase.storage.from(bucket).upload(filePath, file);
+
+                if (error) {
+                    throw error;
+                }
+
+                // Get the public URL
+                const { data: publicUrlData } = supabase.storage.from(bucket).getPublicUrl(filePath);
+                return publicUrlData.publicUrl;
+
+            } catch (error) {
+                console.error('Error uploading file:', error);
+                alert(`Error al subir el archivo: ${error.message}`);
+                return null;
+            }
+        };
+
+        const deleteFile = async (url, bucket) => {
+            if (!url || url.includes('placehold.co')) return; // Don't delete placeholders
+            // Extract the path from the URL by finding the bucket name
+            const urlPath = url.substring(url.indexOf(bucket) + bucket.length + 1);
+            
+            try {
+                const { error } = await supabase.storage.from(bucket).remove([urlPath]);
+
+                if (error) {
+                    throw error;
+                }
+                
+                console.log('File deleted successfully:', urlPath);
+                return true;
+
+            } catch (error) {
+                console.error('Error deleting file:', error);
+                return false;
+            }
+        };
+
+        const showLogin = () => {
+            mainContent.classList.add('hidden');
+            adminPanel.classList.add('hidden');
+            loginScreen.classList.remove('hidden');
+        };
+
+        const hideLogin = () => {
+            loginScreen.classList.add('hidden');
+            mainContent.classList.remove('hidden');
+        };
+
+        const showAdmin = () => {
+            mainContent.classList.add('hidden');
+            loginScreen.classList.add('hidden');
+            adminPanel.classList.remove('hidden');
+            loadAllAdminData(); // Refresh admin data when showing the panel
+        };
+
+        const hideAdmin = () => {
+            adminPanel.classList.add('hidden');
+            mainContent.classList.remove('hidden');
+            loadAllPublicData(); // Refresh public data when returning
+        };
+
+        // --- AUTH/ADMIN UI MANAGEMENT ---
+        
+        document.getElementById('mobile-menu-button').addEventListener('click', () => {
+            document.getElementById('mobile-menu').classList.toggle('hidden');
+            // Toggle icon (optional, left it simple)
+        });
+        
+        document.getElementById('admin-login-link').addEventListener('click', (e) => {
+            e.preventDefault();
+            showLogin();
+        });
+        
+        document.getElementById('cancel-login-btn').addEventListener('click', hideLogin);
+
+        document.getElementById('login-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const user = document.getElementById('username-input').value;
+            const pass = document.getElementById('password-input').value;
+
+            if (user === credentials.user && pass === credentials.pass) {
+                // Set flag on successful login
+                sessionStorage.setItem('isAdmin', 'true');
+                showAdmin();
+            } else {
+                alert('Credenciales incorrectas. Intenta de nuevo.');
+            }
+        });
+        
+        document.getElementById('admin-logout-btn').addEventListener('click', () => {
+            sessionStorage.removeItem('isAdmin');
+            hideAdmin();
+        });
+
+        // --- PUBLIC GALLERY HANDLERS ---
+        document.addEventListener('click', async (e) => {
+            if (e.target.classList.contains('view-gallery-btn')) {
+                const type = e.target.dataset.type;
+                const id = e.target.dataset.id;
+                openGalleryModal(type, id);
+            }
+            if (e.target.classList.contains('gallery-nav-btn')) {
+                const direction = parseInt(e.target.dataset.direction);
+                currentGallery.index = (currentGallery.index + direction + currentGallery.items.length) % currentGallery.items.length;
+                renderGalleryCarousel();
+            }
+        });
+
+        // --- ANNOUNCEMENT HANDLERS ---
+        document.getElementById('add-announcement-btn').addEventListener('click', async () => {
+            const text = document.getElementById('new-announcement-input').value.trim();
+            if (!text) return;
+            
+            const { error } = await supabase.from('announcements').insert([{ text }]);
+            if (error) { console.error('Error adding announcement:', error); alert('Error al agregar el anuncio.'); }
+            
+            document.getElementById('new-announcement-input').value = '';
+            loadAllAdminData(); // Refresh list
+        });
+        
+        document.getElementById('admin-panel').addEventListener('click', async (e) => {
+            if (e.target.classList.contains('delete-announcement-btn')) {
+                itemToDelete = { type: 'announcement', id: e.target.dataset.id };
+                document.getElementById('confirm-message').textContent = '¿Estás seguro de que quieres eliminar este anuncio?';
+                confirmModal.classList.remove('hidden');
+            }
+        });
+
+        // --- ADMIN GALLERY & ITEM HANDLERS (CRUD) ---
+
+        // General Delete Button Handler (Groups, Workshops, Staff)
+        document.getElementById('admin-panel').addEventListener('click', (e) => {
+            if (e.target.classList.contains('delete-item-btn')) {
+                const type = e.target.dataset.type;
+                const id = e.target.dataset.id;
+                itemToDelete = { type, id };
+                const name = type === 'staff' ? 'miembro del equipo' : (type === 'group' ? 'grupo' : 'taller');
+                document.getElementById('confirm-message').textContent = `¿Estás seguro de que quieres eliminar este ${name} y toda su galería (si aplica)?`;
+                confirmModal.classList.remove('hidden');
+            }
+        });
+
+        // Confirmation Modal Delete Action
+        document.getElementById('confirm-delete-btn').addEventListener('click', async () => {
+            if (!itemToDelete) return;
+            confirmModal.classList.add('hidden');
+            
+            try {
+                const { type, id } = itemToDelete;
+                
+                if (type === 'announcement') {
+                    const { error } = await supabase.from('announcements').delete().eq('id', id);
+                    if (error) throw error;
+                    
+                } else { // Group, Workshop, Staff
+                    const tableName = type + 's';
+                    
+                    // 1. Delete associated gallery images (if group/workshop)
+                    if (type !== 'staff') {
+                        const { data: galleryItems } = await supabase.from('gallery').select('img_url').eq('parent_id', id);
+                        if (galleryItems) {
+                            await Promise.all(galleryItems.map(item => deleteFile(item.img_url, 'guarde')));
+                            await supabase.from('gallery').delete().eq('parent_id', id);
+                        }
+                    }
+
+                    // 2. Delete item's cover/photo (if it exists)
+                    const { data: itemData } = await supabase.from(tableName).select(type === 'staff' ? 'photo_url' : 'cover_url').eq('id', id).single();
+                    const urlKey = type === 'staff' ? 'photo_url' : 'cover_url';
+                    if (itemData && itemData[urlKey]) {
+                        await deleteFile(itemData[urlKey], 'guarde');
+                    }
+                    
+                    // 3. Delete the main item
+                    const { error } = await supabase.from(tableName).delete().eq('id', id);
+                    if (error) throw error;
+                }
+                
+                alert('Elemento eliminado con éxito.');
+                loadAllAdminData();
+            } catch (error) {
+                console.error('Error during deletion:', error);
+                alert(`Error al eliminar: ${error.message}`);
+            }
+            itemToDelete = null;
+        });
+
+        // Confirmation Modal Cancel Action
+        document.getElementById('confirm-cancel-btn').addEventListener('click', () => {
+            confirmModal.classList.add('hidden');
+            itemToDelete = null;
+        });
+
+        // Open Add/Edit Modal
+        const openAddEditModal = (type, id = null) => {
+            currentAdminModal = { type, id };
+            const isEditing = id !== null;
+            const titleElement = document.getElementById('adminEditModalTitle');
+            const titleInput = document.getElementById('edit-title');
+            const descInput = document.getElementById('edit-description');
+            const gallerySection = document.getElementById('gallery-management-section');
+            const submitBtn = document.querySelector('#admin-edit-form button[type="submit"]');
+
+            // Reset Form & UI
+            titleInput.value = '';
+            descInput.value = '';
+            gallerySection.classList.add('hidden'); 
+            document.getElementById('adminEditModalGallery').innerHTML = '';
+
+            if (type === 'staff') {
+                titleInput.placeholder = 'Nombre del Miembro';
+                descInput.placeholder = 'Puesto/Rol (e.g. Maestra de Párvulos)';
+                gallerySection.classList.add('hidden');
+            } else {
+                titleInput.placeholder = 'Título del Grupo/Taller';
+                descInput.placeholder = 'Descripción Breve (opcional)';
+                if (isEditing) gallerySection.classList.remove('hidden');
+            }
+            
+            titleElement.textContent = isEditing ? `Editar ${type.charAt(0).toUpperCase() + type.slice(1)}` : `Crear Nuevo ${type.charAt(0).toUpperCase() + type.slice(1)}`;
+            submitBtn.textContent = isEditing ? 'Guardar Cambios' : 'Crear';
+
+            // Load data if editing
+            if (isEditing) {
+                const tableName = type + 's';
+                supabase.from(tableName).select('*').eq('id', id).single().then(async ({ data }) => {
+                    if (data) {
+                        titleInput.value = type === 'staff' ? data.name : data.title;
+                        descInput.value = type === 'staff' ? data.position || '' : data.description || '';
+                        
+                        if (type !== 'staff') {
+                            await renderAdminGalleryImages();
+                        }
+                        adminEditModal.classList.remove('hidden');
+                    }
+                }).catch(err => {
+                    console.error('Error fetching item for edit:', err);
+                    alert('Error al cargar datos para edición.');
+                });
+            } else {
+                adminEditModal.classList.remove('hidden');
+            }
+        };
+
+        // Add Group/Workshop/Staff Handlers
+        document.getElementById('add-group-btn').addEventListener('click', () => openAddEditModal('group'));
+        document.getElementById('add-workshop-btn').addEventListener('click', () => openAddEditModal('workshop'));
+        document.getElementById('add-staff-btn').addEventListener('click', () => openAddEditModal('staff'));
+        
+        // Edit Item Handler
+        document.getElementById('admin-panel').addEventListener('click', (e) => {
+             if (e.target.classList.contains('edit-item-btn')) {
+                const type = e.target.dataset.type;
+                const id = e.target.dataset.id;
+                openAddEditModal(type, id);
+            }
+        });
+
+
+        // Form Submission Handler (Create/Edit Item)
+        document.getElementById('admin-edit-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const { type, id } = currentAdminModal;
+            const isEditing = id !== null;
+            const tableName = type + 's';
+            
+            const title = document.getElementById('edit-title').value.trim();
+            const description = document.getElementById('edit-description').value.trim();
+            
+            if (!title) { alert('El título/nombre es obligatorio.'); return; }
+            
+            const payload = type === 'staff' ? { name: title, position: description } : { title, description };
+
+            try {
+                if (isEditing) {
+                    const { error } = await supabase.from(tableName).update(payload).eq('id', id);
+                    if (error) throw error;
+                    alert('Elemento actualizado con éxito.');
+                } else {
+                    // Placeholder values for cover/photo required for successful insert
+                    const placeholderText = type === 'staff' ? 'Miembro' : 'Elemento';
+                    const tempUrl = `https://placehold.co/150x150/0f2f4c/FFFFFF?text=${placeholderText}`;
+                    payload[type === 'staff' ? 'photo_url' : 'cover_url'] = tempUrl;
+
+                    const { error } = await supabase.from(tableName).insert([payload]);
+                    if (error) throw error;
+                    alert('Elemento creado con éxito. Recuerda subir una foto de portada o foto de perfil.');
+                }
+                
+                adminEditModal.classList.add('hidden');
+                loadAllAdminData();
+            } catch (error) {
+                console.error('Error saving item:', error);
+                alert(`Error al guardar: ${error.message}`);
+            }
+        });
+
+        // Cover/Photo Change Handler (Groups, Workshops, Staff)
+        document.getElementById('admin-panel').addEventListener('change', async (e) => {
+            if (e.target.classList.contains('change-cover-input')) {
+                const file = e.target.files[0];
+                const type = e.target.dataset.type;
+                const id = e.target.dataset.id;
+                
+                if (!file) return;
+
+                const urlKey = type === 'staff' ? 'photo_url' : 'cover_url';
+                const folder = type === 'staff' ? 'staffs' : (type === 'group' ? 'groups' : 'workshops');
+                const tableName = type + 's';
+                
+                try {
+                    // 1. Get old URL to delete it later
+                    const { data: oldData } = await supabase.from(tableName).select(urlKey).eq('id', id).single();
+                    const oldUrl = oldData ? oldData[urlKey] : null;
+
+                    // 2. Upload new file
+                    const newUrl = await uploadFile(file, 'guarde', folder, id, type);
+                    
+                    if (newUrl) {
+                        // 3. Update database
+                        const { error } = await supabase.from(tableName).update({ [urlKey]: newUrl }).eq('id', id);
+                        if (error) throw error;
+                        
+                        // 4. Delete old file if it wasn't the placeholder
+                        if (oldUrl) {
+                            await deleteFile(oldUrl, 'guarde');
+                        }
+
+                        alert(`Foto de ${type} actualizada con éxito.`);
+                        loadAllAdminData();
+                    }
+                } catch (error) {
+                    console.error('Error updating cover/photo:', error);
+                    alert(`Error al actualizar la foto: ${error.message}`);
+                }
+            }
+        });
+
+        // Hero Image Change Handler
+        document.getElementById('change-hero-input').addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            try {
+                // Fixed filename 'hero_image' in the 'settings' folder.
+                const fileName = 'hero_image.png';
+                const filePath = `settings/${fileName}`;
+
+                // 1. Check for old image URL to delete it later
+                const { data: oldData } = await supabase.from('site_settings').select('url').eq('id', 'heroImageUrl').single();
+                const oldUrl = oldData ? oldData.url : null;
+
+                // 2. Upload new file (using upsert for fixed path)
+                const { error: uploadError } = await supabase.storage.from('guarde').upload(filePath, file, { upsert: true });
+
+                if (uploadError) throw uploadError;
+
+                const { data: publicUrlData } = supabase.storage.from('guarde').getPublicUrl(filePath);
+                const newUrl = publicUrlData.publicUrl;
+
+                // 3. Update database setting (using upsert for fixed id)
+                const { error: dbError } = await supabase.from('site_settings').upsert({ id: 'heroImageUrl', url: newUrl });
+                if (dbError) throw dbError;
+
+                // 4. Delete the old file (optional, since upsert overwrites, but good practice if filename changes)
+                // Note: The storage API handles the overwrite, so no explicit delete is strictly needed here unless the path changed entirely.
+
+                alert('Imagen principal actualizada con éxito.');
+                renderHeroImage(); // Refresh hero section
+            } catch (error) {
+                console.error('Error updating hero image:', error);
+                alert(`Error al actualizar la imagen principal: ${error.message}`);
+            }
+        });
+
+
+        // Manage Gallery Button Handler (Opens AdminEditModal with gallery view)
+        document.getElementById('admin-panel').addEventListener('click', (e) => {
+            if (e.target.classList.contains('manage-gallery-btn')) {
+                const type = e.target.dataset.type;
+                const id = e.target.dataset.id;
+                openAddEditModal(type, id); 
+            }
+        });
+
+        const renderAdminGalleryImages = async () => {
+            const { type, id } = currentAdminModal;
+            const { data: galleryItems } = await supabase.from('gallery').select('*').eq('parent_id', id).eq('parent_type', type);
+            
+            const galleryContainer = document.getElementById('adminEditModalGallery');
+            galleryContainer.innerHTML = '';
+            galleryItems.forEach(photo => {
+                galleryContainer.innerHTML += `
+                    <div class="relative group">
+                        <img src="${photo.img_url}" class="w-full h-32 object-cover rounded-md">
+                        <p class="text-xs truncate p-1 bg-black/70 text-slate-300 absolute bottom-0 w-full rounded-b-md">${photo.description || 'Sin Descripción'}</p>
+                        <button data-id="${photo.id}" data-url="${photo.img_url}" class="delete-gallery-image-btn absolute top-1 right-1 bg-red-600 hover:bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition font-bold leading-none">&times;</button>
+                    </div>`;
+            });
+        };
+
+        // Add Gallery Photo Handler
+        document.getElementById('add-gallery-photo-input').addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            const { type, id } = currentAdminModal;
+            if (!file || !id) return;
+            
+            const folder = type === 'group' ? 'groups' : 'workshops';
+            const fileUrl = await uploadFile(file, 'guarde', `${folder}/gallery`, id, 'gallery');
+
+            if (fileUrl) {
+                const description = prompt("Añade una descripción para esta foto (opcional):") || '';
+                const { error } = await supabase.from('gallery').insert([{ 
+                    parent_id: id, 
+                    parent_type: type, 
+                    img_url: fileUrl, 
+                    description 
+                }]);
+                if (error) { console.error('Error inserting gallery item:', error); alert('Error al agregar la foto a la galería.'); }
+                
+                await renderAdminGalleryImages();
+                alert('Foto subida y añadida a la galería.');
+            }
+            e.target.value = ''; // Reset file input
+        });
+
+        // Delete Gallery Photo Handler
+        document.getElementById('adminEditModalGallery').addEventListener('click', async (e) => {
+            if (e.target.classList.contains('delete-gallery-image-btn')) {
+                if (!confirm('¿Estás seguro de que quieres eliminar esta foto de la galería?')) return;
+                
+                const photoId = e.target.dataset.id;
+                const photoUrl = e.target.dataset.url;
+                
+                try {
+                    // 1. Delete file from storage
+                    await deleteFile(photoUrl, 'guarde');
+                    
+                    // 2. Delete record from database
+                    const { error } = await supabase.from('gallery').delete().eq('id', photoId);
+                    if (error) throw error;
+                    
+                    await renderAdminGalleryImages();
+                } catch (error) {
+                    console.error('Error deleting gallery photo:', error);
+                    alert(`Error al eliminar la foto: ${error.message}`);
+                }
+            }
+        });
         
         // --- PUZZLE LOGIC ---
         const puzzleContainer = document.getElementById('puzzle-container');
         const resetPuzzleBtn = document.getElementById('reset-puzzle');
         const winMessage = document.getElementById('win-message');
-        const PUZZLE_IMAGE_URL = 'https://shfevyqcmozvsfljsbjz.supabase.co/storage/v1/object/sign/guarde/WhatsApp%20Image%202025-10-16%20at%2010.16.51%20PM.jpeg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9lOTBhMDU1OC0wNGU0LTRjNzUtOTYzMS04NTc2NTE5MjAyNzciLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJndWFyZGUvV2hhdHNBcHAgSW1hZ2UgMjAyNS0xMC0xNiBhdCAxMC4xNi41MSBQTS5qcGVnIiwiaWF0IjoxNzYwNzczMDQ2LCJleHAiOjE3OTIzMDkwNDZ9.nhVoFghHyVfK-1Hmr8vyOwlPQMYGyTZsEMqO-yE9jaU';
+        // --- INICIO DE CORRECCIÓN ---
+        const PUZZLE_IMAGE_URL = 'https://shfevyqcmozvsfljsbjz.supabase.co/storage/v1/object/sign/guarde/WhatsApp%20Image%202025-10-16%20at%2010.16.51%20PM.jpeg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9lOTBhMDU1OC0wNGU0LTRjNzUtOTYzMS04NTc2NTE5MjAyNzciLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJndWFyZGUvV2hhdHNBcHAgSW1hZ2UgMjAyNS0xMC0xNiBhdCAxMC4xNi41MSBQTS5qcGVnIiwiaWF0IjoxNzYwODAzOTIwLCJleHAiOjE3OTIzMzk5MjB9.M0I2FcGbTR0YY0IZLSwPShOX0v6EQYqckioVdlX24WA';
+        // --- FIN DE CORRECCIÓN ---
         const GRID_SIZE = 4;
         let selectedPiece = null;
 
+        /**
+         * Inicializa el rompecabezas solo después de cargar la imagen.
+         */
         function initPuzzle() {
-            puzzleContainer.innerHTML = '';
-            winMessage.classList.add('hidden');
-            let pieces = [];
-            for (let i = 0; i < GRID_SIZE * GRID_SIZE; i++) {
-                pieces.push(i);
-            }
+            puzzleContainer.innerHTML = '<div class="col-span-4 flex justify-center items-center h-full"><div class="loader"></div></div>'; // Show loader
 
-            // Simple shuffle
-            pieces.sort(() => Math.random() - 0.5);
-
-            for (let i = 0; i < pieces.length; i++) {
-                const pieceIndex = pieces[i];
-                const piece = document.createElement('div');
-                piece.classList.add('puzzle-piece', 'bg-cover', 'bg-no-repeat', 'rounded-sm', 'cursor-pointer');
-                piece.dataset.currentIndex = pieceIndex;
-                piece.dataset.originalIndex = i;
+            const image = new Image();
+            image.onload = () => {
+                puzzleContainer.innerHTML = '';
+                winMessage.classList.add('hidden');
                 
-                const col = pieceIndex % GRID_SIZE;
-                const row = Math.floor(pieceIndex / GRID_SIZE);
-                
-                piece.style.backgroundImage = `url(${PUZZLE_IMAGE_URL})`;
-                piece.style.backgroundSize = `${GRID_SIZE * 100}%`;
-                piece.style.backgroundPosition = `${col * 100 / (GRID_SIZE - 1)}% ${row * 100 / (GRID_SIZE - 1)}%`;
-                
-                piece.addEventListener('click', onPieceClick);
-                puzzleContainer.appendChild(piece);
-            }
-        }
-
-        function onPieceClick(e) {
-            const clickedPiece = e.target;
-            if (!selectedPiece) {
-                selectedPiece = clickedPiece;
-                selectedPiece.classList.add('selected');
-            } else {
-                if (selectedPiece !== clickedPiece) {
-                    // Swap data attributes and styles
-                    const tempIndex = selectedPiece.dataset.currentIndex;
-                    const tempBgPos = selectedPiece.style.backgroundPosition;
-
-                    selectedPiece.dataset.currentIndex = clickedPiece.dataset.currentIndex;
-                    selectedPiece.style.backgroundPosition = clickedPiece.style.backgroundPosition;
-
-                    clickedPiece.dataset.currentIndex = tempIndex;
-                    clickedPiece.style.backgroundPosition = tempBgPos;
-                    
-                    checkWin();
+                let pieces = [];
+                for (let i = 0; i < GRID_SIZE * GRID_SIZE; i++) {
+                    pieces.push(i);
                 }
-                selectedPiece.classList.remove('selected');
-                selectedPiece = null;
-            }
-        }
 
+                // Shuffle the pieces
+                pieces.sort(() => Math.random() - 0.5);
+
+                // Simple check to ensure it's not solved immediately (optional for 4x4)
+                let isSolved = true;
+                for (let i = 0; i < pieces.length; i++) {
+                    if (pieces[i] !== i) {
+                        isSolved = false;
+                        break;
+                    }
+                }
+                // If solved, swap two pieces to ensure it starts shuffled
+                if (isSolved) {
+                    [pieces[0], pieces[1]] = [pieces[1], pieces[0]];
+                }
+
+                for (let i = 0; i < pieces.length; i++) {
+                    const pieceIndex = pieces[i]; // The content index (0-15)
+                    const piece = document.createElement('div');
+                    piece.classList.add('puzzle-piece', 'bg-cover', 'bg-no-repeat', 'rounded-sm', 'cursor-pointer');
+                    
+                    // The element's current position (i) and the content it holds (pieceIndex)
+                    piece.dataset.currentGridPosition = i; 
+                    piece.dataset.originalIndex = pieceIndex; 
+                    
+                    const col = pieceIndex % GRID_SIZE;
+                    const row = Math.floor(pieceIndex / GRID_SIZE);
+                    
+                    // Calculate background position to show the correct part of the image
+                    const bgX = (col * 100 / (GRID_SIZE - 1));
+                    const bgY = (row * 100 / (GRID_SIZE - 1));
+                    
+                    piece.style.backgroundImage = `url(${PUZZLE_IMAGE_URL})`;
+                    piece.style.backgroundSize = `${GRID_SIZE * 100}%`;
+                    piece.style.backgroundPosition = `${bgX}% ${bgY}%`;
+                    
+                    piece.addEventListener('click', onPieceClick);
+                    puzzleContainer.appendChild(piece);
+                }
+            };
+            image.onerror = () => {
+                puzzleContainer.innerHTML = '<div class="col-span-4 text-center text-red-400">Error al cargar la imagen del rompecabezas. Verifica la URL.</div>';
+            };
+            image.src = PUZZLE_IMAGE_URL;
+        }
+        
         function checkWin() {
             const pieces = [...puzzleContainer.children];
             const isWon = pieces.every((piece, i) => {
-                return parseInt(piece.dataset.currentIndex) === i;
+                // Check if the content (originalIndex) is at the correct grid position (i)
+                return parseInt(piece.dataset.originalIndex) === i; 
             });
             
             if (isWon) {
                 winMessage.classList.remove('hidden');
-                 pieces.forEach(p => p.classList.add('selected'));
+                pieces.forEach(p => p.classList.add('selected', 'transition-none')); // Keep final position highlighted
+                setTimeout(() => pieces.forEach(p => p.classList.remove('selected', 'transition-none')), 1500);
             }
         }
+        
+        function onPieceClick(e) {
+            const clickedPiece = e.target;
+            if (!clickedPiece.classList.contains('puzzle-piece')) return;
 
+            if (!selectedPiece) {
+                // First selection
+                selectedPiece = clickedPiece;
+                selectedPiece.classList.add('selected');
+            } else {
+                if (selectedPiece === clickedPiece) {
+                    // Deselect
+                    selectedPiece.classList.remove('selected');
+                    selectedPiece = null;
+                } else {
+                    // Second selection: Swap visual content
+                    // 1. Swap Original Index (The content identifier)
+                    const tempOriginalIndex = selectedPiece.dataset.originalIndex;
+                    const tempBgPos = selectedPiece.style.backgroundPosition;
+
+                    selectedPiece.dataset.originalIndex = clickedPiece.dataset.originalIndex;
+                    selectedPiece.style.backgroundPosition = clickedPiece.style.backgroundPosition;
+
+                    clickedPiece.dataset.originalIndex = tempOriginalIndex;
+                    clickedPiece.style.backgroundPosition = tempBgPos;
+                    
+                    // 2. Clear selection
+                    selectedPiece.classList.remove('selected');
+                    selectedPiece = null;
+                    
+                    checkWin();
+                }
+            }
+        }
+        
         resetPuzzleBtn.addEventListener('click', initPuzzle);
 
 
-        // --- INITIALIZATION & ANIMATION---
-        const header = document.getElementById('main-header');
-        const navLinks = header.querySelectorAll('.nav-link');
-        const mobileMenuBtnIcon = header.querySelector('#mobile-menu-button svg');
+        // --- DRAWING LOGIC ---
         const drawingCanvas = document.getElementById('drawing-canvas');
         const drawingCtx = drawingCanvas.getContext('2d');
         const colorPalette = document.getElementById('color-palette');
@@ -522,14 +1143,38 @@
         let isDrawing = false;
         let lastX = 0;
         let lastY = 0;
+        const initialColor = '#ffffff';
 
         function resizeDrawingCanvas() {
             const container = drawingCanvas.parentElement;
-            drawingCanvas.width = container.clientWidth;
-            drawingCanvas.height = 400; // Adjusted height
+            
+            // 1. Check if the canvas has been successfully sized before trying to copy its content
+            const isCanvasInitialized = drawingCanvas.width > 0 && drawingCanvas.height > 0;
+
+            if (isCanvasInitialized) {
+                // Store current drawing state
+                const tempCanvas = document.createElement('canvas');
+                const tempCtx = tempCanvas.getContext('2d');
+                tempCanvas.width = drawingCanvas.width;
+                tempCanvas.height = drawingCanvas.height;
+                tempCtx.drawImage(drawingCanvas, 0, 0);
+                
+                // Set new dimensions
+                drawingCanvas.width = container.clientWidth;
+                drawingCanvas.height = 400; // Fixed drawing height for consistency
+                
+                // Restore drawing state
+                drawingCtx.drawImage(tempCanvas, 0, 0, drawingCanvas.width, drawingCanvas.height);
+            } else {
+                // If not initialized, just set dimensions without drawing
+                drawingCanvas.width = container.clientWidth;
+                drawingCanvas.height = 400; 
+            }
+            
+            // Set drawing properties
             drawingCtx.lineCap = 'round';
             drawingCtx.lineJoin = 'round';
-            drawingCtx.strokeStyle = '#ffffff';
+            drawingCtx.strokeStyle = initialColor;
             drawingCtx.lineWidth = 5;
         }
 
@@ -540,7 +1185,12 @@
         
         function getTouchPos(e) {
             const rect = drawingCanvas.getBoundingClientRect();
-             return { x: e.touches[0].clientX - rect.left, y: e.touches[0].clientY - rect.top };
+             // Prevent scrolling while drawing on canvas
+             e.preventDefault(); 
+             if (e.touches.length > 0) {
+                return { x: e.touches[0].clientX - rect.left, y: e.touches[0].clientY - rect.top };
+             }
+             return { x: lastX, y: lastY }; // Fallback
         }
 
         function startDrawing(e) {
@@ -551,8 +1201,8 @@
 
         function draw(e) {
             if (!isDrawing) return;
-            e.preventDefault();
             const pos = e.touches ? getTouchPos(e) : getMousePos(e);
+            
             drawingCtx.beginPath();
             drawingCtx.moveTo(lastX, lastY);
             drawingCtx.lineTo(pos.x, pos.y);
@@ -566,8 +1216,9 @@
         drawingCanvas.addEventListener('mousemove', draw);
         drawingCanvas.addEventListener('mouseup', stopDrawing);
         drawingCanvas.addEventListener('mouseout', stopDrawing);
-        drawingCanvas.addEventListener('touchstart', startDrawing);
-        drawingCanvas.addEventListener('touchmove', draw);
+        // Added passive: false for touchmove to allow preventDefault
+        drawingCanvas.addEventListener('touchstart', startDrawing, { passive: false });
+        drawingCanvas.addEventListener('touchmove', draw, { passive: false });
         drawingCanvas.addEventListener('touchend', stopDrawing);
 
         colorPalette.addEventListener('click', (e) => {
@@ -588,6 +1239,7 @@
             link.click();
         });
 
+        // --- BACKGROUND ANIMATION ---
         const handleScroll = () => {
             const isScrolled = window.scrollY > 50;
             header.classList.toggle('bg-slate-900/80', isScrolled);
@@ -596,6 +1248,7 @@
             header.classList.toggle('text-white', !isScrolled);
         };
         
+        const header = document.getElementById('main-header');
         const canvas = document.getElementById('star-canvas');
         const ctx = canvas.getContext('2d');
         let stars = [];
@@ -610,7 +1263,7 @@
                     y: Math.random() * canvas.height,
                     radius: Math.random() * 1.5,
                     alpha: Math.random(),
-                    dAlpha: Math.random() * 0.02 - 0.01
+                    dAlpha: Math.random() * 0.02 - 0.01 // blinking effect
                 });
             }
         }
@@ -619,7 +1272,7 @@
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             stars.forEach(star => {
                 star.alpha += star.dAlpha;
-                if (star.alpha <= 0 || star.alpha >= 1) {
+                if (star.alpha <= 0.1 || star.alpha >= 1) {
                     star.dAlpha *= -1;
                 }
                 ctx.beginPath();
@@ -630,19 +1283,29 @@
             requestAnimationFrame(animateStars);
         }
         
+        // --- INITIALIZATION ---
         const initApp = () => {
-            loadAllPublicData();
+            // Check admin status first
+            if (sessionStorage.getItem('isAdmin') === 'true') {
+                showAdmin();
+            } else {
+                hideAdmin(); // Loads public data
+            }
+            
             handleScroll();
             document.getElementById('copyright-year').textContent = new Date().getFullYear();
             window.addEventListener('scroll', handleScroll);
-            window.addEventListener('resize', resizeStarCanvas);
+            window.addEventListener('resize', () => { resizeStarCanvas(); resizeDrawingCanvas(); });
+            
+            // Resize and start animations/games
             resizeStarCanvas();
             animateStars();
-            resizeDrawingCanvas();
-            initPuzzle();
+            resizeDrawingCanvas(); // Corregido para manejar la inicialización.
+            initPuzzle(); // Initial load of the puzzle
         };
         
-        initApp();
+        // Start the application
+        window.addEventListener('load', initApp);
     </script>
 </body>
 </html>
